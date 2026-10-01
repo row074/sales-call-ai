@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/usage/{day} {
+      allow read: if isOwner(userId) && isDayId(day);
+
+      allow create: if isOwner(userId)
+        && isDayId(day)
+        && hasUsageKeys(request.resource.data)
+        && request.resource.data.suggestionsUsed is int
+        && request.resource.data.dailyLimit is int
+        && request.resource.data.updatedAt is timestamp
+        && request.resource.data.suggestionsUsed == 1
+        && request.resource.data.dailyLimit >= 1
+        && request.resource.data.dailyLimit <= 50
+        && request.resource.data.suggestionsUsed <= request.resource.data.dailyLimit;
+
+      allow update: if isOwner(userId)
+        && isDayId(day)
+        && hasUsageKeys(request.resource.data)
+        && request.resource.data.suggestionsUsed is int
+        && request.resource.data.dailyLimit is int
+        && request.resource.data.updatedAt is timestamp
+        && request.resource.data.dailyLimit == resource.data.dailyLimit
+        && request.resource.data.suggestionsUsed == resource.data.suggestionsUsed + 1
+        && request.resource.data.suggestionsUsed <= resource.data.dailyLimit;
+
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+function isOwner(userId) {
+  return request.auth != null && request.auth.uid == userId;
+}
+
+function isDayId(day) {
+  return day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+}
+
+function hasUsageKeys(data) {
+  return data.keys().hasOnly(['suggestionsUsed', 'dailyLimit', 'updatedAt']);
+}

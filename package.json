@@ -1,0 +1,34 @@
+{
+  "name": "sales-call-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop Sales Call AI Assistant",
+  "author": "Sales Call AI",
+  "type": "module",
+  "main": "dist-electron/main.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p electron/tsconfig.json && tsc -p electron/tsconfig.preload.json",
+    "build": "npm run build:renderer && npm run build:electron"
+  },
+  "dependencies": {
+    "@deepgram/sdk": "^5.13.0",
+    "firebase": "^12.19.0",
+    "openai": "^7.25.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "electron": "^44.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}
